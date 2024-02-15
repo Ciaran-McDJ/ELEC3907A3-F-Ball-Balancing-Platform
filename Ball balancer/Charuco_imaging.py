@@ -1,43 +1,88 @@
 import cv2 as cv
 import numpy as np
 import os
+from typing import Optional
+
+"""
+Module for Charuco imaging.
+
+This module provides functions for generating and manipulating Charuco boards, saving camera calibration parameters, drawing corners on images, transforming perspective, sharpening images, and getting the position of a circle in an image.
+
+"""
+
 
 class Config:
-    ARUCO_DICT = cv.aruco.DICT_5X5_250
-    SIZE = (8, 8)
-    SQUARE_LENGTH = 0.024
-    MARKER_LENGTH = 0.014
-    IMAGE_SIZE = (800, 800)
-    CALIBRATION_LOCATION = 'C:/Users/trist/OneDrive/Desktop/Projects/ELEC3907A3-F-Ball-Balancing-Platform/Ball balancer/CamCalibration'
-    CAM_MATRIX_PATH = 'C:/Users/trist/OneDrive/Desktop/Projects/ELEC3907A3-F-Ball-Balancing-Platform/Ball balancer/3camMatrix.npy'
-    DISTORTION_MATRIX_PATH = 'C:/Users/trist/OneDrive/Desktop/Projects/ELEC3907A3-F-Ball-Balancing-Platform/Ball balancer/3distMatrix.npy'
-    TRANSFORMED_SIZE = (480, 480)
+    """
+    The `Config` class represents the configuration parameters for the Charuco imaging application.
 
-def load_charuco_board():
+    Attributes:
+    ARUCO_DICT (int): The ARUCO dictionary type.
+    SIZE (tuple): The number of squares in the Charuco board.
+    SQUARE_LENGTH (float): The length of each square in meters.
+    MARKER_LENGTH (float): The length of each marker in meters.
+    IMAGE_SIZE (tuple): The size of the generated Charuco board image.
+    CALIBRATION_LOCATION (str): The location of the calibration images folder.
+    CAM_MATRIX_PATH (str): The file path to save the camera matrix.
+    DISTORTION_MATRIX_PATH (str): The file path to save the distortion matrix.
+    TRANSFORMED_SIZE (tuple): The size of the transformed image.
+    """
+    ARUCO_DICT = cv.aruco.DICT_5X5_250  # ArUco dictionary to use
+    SIZE = (8, 8)  # Size of the Charuco board
+    SQUARE_LENGTH = 0.024  # Length of the squares in the Charuco board
+    MARKER_LENGTH = 0.014  # Length of the markers in the Charuco board
+    IMAGE_SIZE = (800, 800)  # Size of the image to generate
+    CALIBRATION_LOCATION = 'C:/Users/trist/OneDrive/Desktop/Projects/ELEC3907A3-F-Ball-Balancing-Platform/Ball balancer/CamCalibration'  # Location of the calibration images
+    CAM_MATRIX_PATH = 'C:/Users/trist\OneDrive/Desktop/Projects/ELEC3907A3-F-Ball-Balancing-Platform/Ball balancer/3camMatrix.npy'  # Path to save the camera matrix
+    DISTORTION_MATRIX_PATH = 'C:/Users/trist\OneDrive/Desktop/Projects/ELEC3907A3-F-Ball-Balancing-Platform/Ball balancer/3distMatrix.npy' # Path to save the distortion matrix
+    TRANSFORMED_SIZE = (480, 480)  # Size of the transformed image
+
+
+
+def load_charuco_board() -> cv.aruco.CharucoBoard:
+    """
+    Load the Charuco board.
+
+    Returns:
+        cv.aruco.CharucoBoard: The loaded Charuco board.
+    """
     dictionary = cv.aruco.getPredefinedDictionary(Config.ARUCO_DICT)
     return cv.aruco.CharucoBoard(Config.SIZE, Config.SQUARE_LENGTH, Config.MARKER_LENGTH, dictionary)
 
-def generateCharucoBoard():
+
+def generateCharucoBoard() -> None:
+    """
+    Generate a Charuco board image.
+    """
     board = load_charuco_board()
     image = board.generateImage(Config.IMAGE_SIZE)
 
     cv.imshow("charuco", image)
     np.save('charucoBoard.npy', board)
 
+    # Wait for the user to press 'q' to quit
     while True:
         if cv.waitKey(1) & 0xFF == ord('q'):
             break
 
-def saveCalibrationCameraParameters():
+    cv.destroyAllWindows()
+
+
+def saveCalibrationCameraParameters() -> None:
+    """
+    Save the camera calibration parameters.
+    """
+
     dictionary = cv.aruco.getPredefinedDictionary(Config.ARUCO_DICT)
     board = load_charuco_board()
     params = cv.aruco.DetectorParameters()
 
+    # Get a list of all the .jpg images in the calibration location
     images = [os.path.join(Config.CALIBRATION_LOCATION, filename) for filename in os.listdir(Config.CALIBRATION_LOCATION) if filename.endswith('.jpg')]
 
     all_charuco_corners = []
     all_charuco_ids = []
 
+    # For each image, detect the markers and interpolate the Charuco corners
     for image_file in images:
         image = cv.imread(image_file)
         marker_corners, marker_ids, _ = cv.aruco.detectMarkers(image, dictionary, parameters=params)
@@ -47,13 +92,30 @@ def saveCalibrationCameraParameters():
                 all_charuco_corners.append(charuco_corners)
                 all_charuco_ids.append(charuco_ids)
 
+    # Calibrate the camera using the Charuco corners and ids
     retval, camera_matrix, dist_coeffs, rvecs, tvecs = cv.aruco.calibrateCameraCharuco(all_charuco_corners, all_charuco_ids, board, image.shape[:2], None, None)
 
+    # Save the camera matrix and distortion coefficients
     np.save(Config.CAM_MATRIX_PATH, camera_matrix)
     np.save(Config.DISTORTION_MATRIX_PATH, dist_coeffs)
     print("Calibration complete and saved")
 
-def drawCorners(image, dictionary, board, camMatrix, distMatrix):
+
+def drawCorners(image: np.ndarray, dictionary: cv.aruco.Dictionary, board: cv.aruco.CharucoBoard, camMatrix: np.ndarray, distMatrix: np.ndarray) -> tuple[bool, np.ndarray]:
+    """
+    Draw corners on an image.
+
+    Args:
+        image (np.ndarray): The input image.
+        dictionary (cv.aruco.Dictionary): The ArUco dictionary.
+        board (cv.aruco.CharucoBoard): The Charuco board.
+        camMatrix (np.ndarray): The camera matrix.
+        distMatrix (np.ndarray): The distortion matrix.
+
+    Returns:
+        Tuple[bool, np.ndarray]: A tuple containing a boolean indicating if the corners were successfully drawn and the resulting image.
+
+    """
     x_size, y_size = Config.SIZE
     charucoPoints3D = [(0,0,0), (x_size*Config.SQUARE_LENGTH, 0, 0), (0, y_size*Config.SQUARE_LENGTH, 0), (x_size*Config.SQUARE_LENGTH, y_size*Config.SQUARE_LENGTH, 0)]
 
@@ -71,6 +133,7 @@ def drawCorners(image, dictionary, board, camMatrix, distMatrix):
     if charucoCornerLocations is None or len(charucoCornerLocations) == 0 or len(charucoIds) < 6:
         return False, image
 
+    # Estimate the pose of the Charuco board
     ret, rvec, tvec = cv.aruco.estimatePoseCharucoBoard(charucoCornerLocations, charucoIds, board, camMatrix, distMatrix, None, None, useExtrinsicGuess=False)
     cornerArray = []
     if ret:
@@ -84,23 +147,64 @@ def drawCorners(image, dictionary, board, camMatrix, distMatrix):
 
     return False, image
 
-def transformPerspective(image, cornerList):
+def transformPerspective(image: np.ndarray, cornerList: np.ndarray) -> np.ndarray:
+    """
+    Transform the perspective of an image.
+
+    Args:
+        image (np.ndarray): The input image.
+        cornerList (np.ndarray): The list of corners.
+
+    Returns:
+        np.ndarray: The transformed image.
+
+    """
+
     x_length, y_length = Config.TRANSFORMED_SIZE
     destination = np.array([(0,0), (x_length,0), (0, y_length), (x_length, y_length)])
     transform, mask = cv.findHomography(cornerList, destination, cv.RANSAC, 5.0)
-    transformedImage = cv.warpPerspective(image, transform, (x_length, y_length))
-    return transformedImage
+    return cv.warpPerspective(image, transform, (x_length, y_length))
 
-def get_circle_position(image):
+def get_circle_position(image: np.ndarray, pixleSizeRatio) -> tuple[Optional[float], Optional[float]]:
+    """
+    Get the position of a circle in an image.
+
+    Args:
+        image (np.ndarray): The input image.
+
+    Returns:
+        Tuple[Optional[float], Optional[float]]: A tuple containing the x and y positions of the circle, or None if the circle was not found.
+    """
+    
     return None, None
 
-def sharpenImage(image, kernel_size=(7,7), sigma=0.25, intensity=4):
+def sharpenImage(image: np.ndarray, kernel_size: tuple[int, int] = (7, 7), sigma: float = 0.25, intensity: int = 4) -> np.ndarray:
+    """
+    Sharpen an image.
+
+    Args:
+        image (np.ndarray): The input image.
+        kernel_size (Tuple[int, int], optional): The size of the Gaussian kernel. Defaults to (7, 7).
+        sigma (float, optional): The standard deviation of the Gaussian kernel. Defaults to 0.25.
+        intensity (int, optional): The intensity of the sharpening effect. Defaults to 4.
+
+    Returns:
+        np.ndarray: The sharpened image.
+
+    """
     gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
     blurred = cv.GaussianBlur(gray, kernel_size, sigma)
-    sharpened = cv.addWeighted(gray, 1.0 + intensity, blurred, -intensity, 0)
-    return sharpened
+    return cv.addWeighted(gray, 1.0 + intensity, blurred, -intensity, 0)
 
-def main():
+# Main function
+def main() -> None:  # sourcery skip: do-not-use-bare-except
+    """
+    The main function.
+
+    Raises:
+        Exception: If loading calibration files fails.
+
+    """
     try:
         camMatrix = np.load(Config.CAM_MATRIX_PATH)
         distMatrix = np.load(Config.DISTORTION_MATRIX_PATH)
@@ -117,6 +221,7 @@ def main():
     start_time = cv.getTickCount()
     fps = 0
 
+    # Main loop
     while True:
         ret, frame = cam.read()
 
@@ -131,7 +236,7 @@ def main():
             try:
                 if frame_to_display is not None:
                     if corner_ret:
-                        current_x_pos, current_y_pos = get_circle_position(frame_to_display)
+                        current_x_pos, current_y_pos = get_circle_position(frame_to_display,1)
 
                     fps_text = f"FPS: {fps:.2f}"
                     cv.putText(frame_to_display, fps_text, (20, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
