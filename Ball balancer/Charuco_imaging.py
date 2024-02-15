@@ -10,11 +10,12 @@ SQUARE_LENGTH = 0.024 # meters
 MARKER_LENGTH = 0.014 # meters
 MARKER_RATIO = SQUARE_LENGTH/MARKER_LENGTH
 IMAGE_SIZE = (800,800)
-CALIBRATION_LOCATION = 'C:/Users/trist/OneDrive/Desktop/Projects/Ball balancer/CamCalibration'
-CAM_MATRIX_PATH = 'C:/Users/trist\OneDrive/Desktop/Projects/Ball balancer/3camMatrix.npy'
-DISTORTION_MATRIX_PATH = 'C:/Users/trist\OneDrive/Desktop/Projects/Ball balancer/3distMatrix.npy'
+CALIBRATION_LOCATION = 'C:/Users/trist/OneDrive/Desktop/Projects/ELEC3907A3-F-Ball-Balancing-Platform/Ball balancer/CamCalibration'
+CAM_MATRIX_PATH = 'C:/Users/trist\OneDrive/Desktop/Projects/ELEC3907A3-F-Ball-Balancing-Platform/Ball balancer/3camMatrix.npy'
+DISTORTION_MATRIX_PATH = 'C:/Users/trist\OneDrive/Desktop/Projects/ELEC3907A3-F-Ball-Balancing-Platform/Ball balancer/3distMatrix.npy'
 WINDOW_SIZE = (480, 640)
 TRANSFORMED_SIZE = (480, 480)
+
 
 
 
