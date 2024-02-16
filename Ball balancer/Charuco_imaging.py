@@ -165,7 +165,7 @@ def transformPerspective(image: np.ndarray, cornerList: np.ndarray) -> np.ndarra
     transform, mask = cv.findHomography(cornerList, destination, cv.RANSAC, 5.0)
     return cv.warpPerspective(image, transform, (x_length, y_length))
 
-def get_circle_position(image: np.ndarray, pixleSizeRatio) -> tuple[Optional[float], Optional[float]]:
+def get_circle_position(image: np.ndarray, pixleSizeRatio: float) -> tuple[Optional[float], Optional[float]]:
     """
     Get the position of a circle in an image.
 
@@ -173,9 +173,15 @@ def get_circle_position(image: np.ndarray, pixleSizeRatio) -> tuple[Optional[flo
         image (np.ndarray): The input image.
 
     Returns:
-        Tuple[Optional[float], Optional[float]]: A tuple containing the x and y positions of the circle, or None if the circle was not found.
+        Tuple[Optional[float], Optional[float]]: A tuple containing the x and y positions of the circle in meters, or None if the circle was not found.
     """
-    
+    circles = cv.HoughCircles(image, cv.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=0)
+    if circles is not None:
+        circles = np.round(circles[0, :]).astype("int")
+        for (x, y, r) in circles:
+            x_pos = x * pixleSizeRatio
+            y_pos = y * pixleSizeRatio
+            return x_pos, y_pos     
     return None, None
 
 def sharpenImage(image: np.ndarray, kernel_size: tuple[int, int] = (7, 7), sigma: float = 0.25, intensity: int = 4) -> np.ndarray:
@@ -220,6 +226,8 @@ def main() -> None:  # sourcery skip: do-not-use-bare-except
     frame_count = 0
     start_time = cv.getTickCount()
     fps = 0
+    pixleSizeRatio = (Config.SIZE[0]*Config.SQUARE_LENGTH) / Config.TRANSFORMED_SIZE[0]
+    print(pixleSizeRatio)
 
     # Main loop
     while True:
