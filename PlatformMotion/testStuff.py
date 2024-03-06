@@ -2,9 +2,7 @@ import numpy as np
 
 from helperFuncs import *
 
-A = np.array([[0,0,0],[2,0,0],[0,0,0]])
-B = np.array([[1,0,0],[0,0,0],[0,0,0]])
+if 3 < 6 < 2:
+    print("It printed")
 
-R = np.matmul(A, B)
 
-print(R)

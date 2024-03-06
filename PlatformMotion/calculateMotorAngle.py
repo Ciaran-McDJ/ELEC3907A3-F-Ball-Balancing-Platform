@@ -74,13 +74,13 @@ def calculateMotorAngle(pitch:float, roll:float, z:float) -> tuple[float,float,f
     alpha2 = 90 - math.degrees(math.acos( np.dot(B2,l2) / (B*magl2) ))
     alpha3 = 90 - math.degrees(math.acos( np.dot(B3,l3) / (B*magl3) ))
 
-    # % psi represents the motor angle, angle between controlled arm and z-axis
-    psi1 = alpha1 + beta1
-    psi2 = alpha2 + beta2
-    psi3 = alpha3 + beta3
+    # % psi represents the motor angle, angle between controlled arm and xy plane
+    psi1 = 90 - (alpha1 + beta1)
+    psi2 = 90 - (alpha2 + beta2)
+    psi3 = 90 - (alpha3 + beta3)
 
     return (psi1, psi2, psi3)
 
-
-angles = calculateMotorAngle(-20,20,10)    
-print(angles)
+if __name__ == "main":
+    angles = calculateMotorAngle(-20,20,10)    
+    print(angles)
