@@ -68,11 +68,11 @@ def calculateMotorAngle(pitch:float, roll:float, z:float) -> tuple[float,float,f
     beta2 = math.degrees(math.acos( (-b**2+a**2+magl2sqrd) / (2*a*magl2) ))
     beta3 = math.degrees(math.acos( (-b**2+a**2+magl3sqrd) / (2*a*magl3) ))
 
-    # % alpha represents the angle between the z-axis and the l vector
-    # % TODO - can probably make this one more efficient
-    alpha1 = math.degrees(math.atan( math.sqrt(l1[0]**2+l1[1]**2) / l1[2] ))
-    alpha2 = math.degrees(math.atan( math.sqrt(l2[0]+l2[1]) / l2[2] ))
-    alpha3 = math.degrees(math.atan( math.sqrt(l3[0]+l3[1]) / l3[2] ))
+    # alpha represents the angle between the z-axis and the l vector
+    # pos means l in same direction as B vector, neg means l away from B vector
+    alpha1 = 90 - math.degrees(math.acos( np.dot(B1,l1) / (B*magl1) ))
+    alpha2 = 90 - math.degrees(math.acos( np.dot(B2,l2) / (B*magl2) ))
+    alpha3 = 90 - math.degrees(math.acos( np.dot(B3,l3) / (B*magl3) ))
 
     # % psi represents the motor angle, angle between controlled arm and z-axis
     psi1 = alpha1 + beta1
@@ -82,4 +82,5 @@ def calculateMotorAngle(pitch:float, roll:float, z:float) -> tuple[float,float,f
     return (psi1, psi2, psi3)
 
 
-calculateMotorAngle(10, 5, 20)    
+angles = calculateMotorAngle(-20,20,10)    
+print(angles)
