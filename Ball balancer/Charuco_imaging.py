@@ -251,7 +251,7 @@ def main() -> None:  # sourcery skip: do-not-use-bare-except
                     #fps_text = f"FPS: {fps:.2f}"
                     #cv.putText(frame_to_display, fps_text, (20, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-                    cv.imshow("with ids", frame_to_display)  
+                    #cv.imshow("with ids", frame_to_display)  
                     #cv.imshow("unsharpened", cv.cvtColor(undistorted, cv.COLOR_BGR2GRAY))
             except:
                 pass
