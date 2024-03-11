@@ -11,7 +11,8 @@ Things we can try
     - If use velocity, not sure how control loop works (ciaran has basic idea to try with this)
     - If don't use velocity, probably need to use derivative term of control loop, need to figure out what prof was telling use when she said not to use it
 - Could use z in some way, right now not using it at all
-
+- Right now use of pitch and roll is kinda flawed in that they are not equivalent and amount of roll decides effect that pitch will have
+    - Can make change to everything to use angle of steepest slope and steepness angle (modify platform motion to use it and use correction terms in main.py to use it)
 
 
 Things we can do that probably don't matter

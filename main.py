@@ -5,7 +5,6 @@
 
 
 
-
 # DEFINE CONSTANTS
 desiredPosX = 100 #Units? TODO what should be for center?
 desiredPosY = 100
@@ -34,8 +33,6 @@ intXErr = 0 # Integral Error based on cumulative total of error # TODO - am I im
 intYErr = 0
 correctionX = 0
 correctionY = 0
-motor1Angle, motor2Angle, motor3Angle = (0,0,0)
-
 
 if __name__ == "main":
     print("Starting Main Loop")
@@ -50,12 +47,12 @@ if __name__ == "main":
         lastPropYErr = propYErr
 
 
-
-
         
         # GET CAMERA DATA
         newXPos, newYPos = getCameraData()
         # TODO - deal with case where it returns None (didn't detect ball), also if ball goess off maybe if doesn't detect for some amount of time just stop
+
+
 
         # COMPUTE ERROR AND HOW PLATFORM MUST MOVE
         propXErr = newXPos - desiredPosX # Positive means newXPos is too positive
@@ -64,18 +61,17 @@ if __name__ == "main":
         derXErr = (propXErr - lastPropXErr)/timeSinceLastLoop # Positive means propXErr increasing
         derYErr = (propYErr - lastPropYErr)/timeSinceLastLoop
 
-        intXErr += propXErr * timeSinceLastLoop # Positive means propXErr
+        intXErr += propXErr * timeSinceLastLoop # Positive means propXErr is staying too positive
         intYErr += propYErr * timeSinceLastLoop
 
         correctionX = (propXErr * kPX) + (derXErr * kDX) + (intXErr * kIX)
         correctionY = (propYErr * kPY) + (derYErr * kDY) + (intYErr * kIY)
         
 
+
         # MOVE MOTORS
         # Note - right now pitch and roll proportional to correction, from small angle approximation angle should be roughly proportional to force which should be proportional to correction
-        motor1Angle, motor2Angle, motor3Angle = calculateMotorAngle(correctionY, correctionX)
-
-        moveMotors(motor1Angle, motor2Angle, motor3Angle)
+        moveMotors(roll = correctionY, pitch = correctionX, z = 0)
 
 
 
