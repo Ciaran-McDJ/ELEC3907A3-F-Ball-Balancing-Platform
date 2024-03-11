@@ -175,7 +175,7 @@ def get_circle_position(image: np.ndarray, pixleSizeRatio: float) -> tuple[Optio
     Returns:
         Tuple[Optional[float], Optional[float]]: A tuple containing the x and y positions of the circle in meters, or None if the circle was not found.
     """
-    circles = cv.HoughCircles(image, cv.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=0)
+    circles = cv.HoughCircles(image, cv.HOUGH_GRADIENT, 1, 200, param1=75, param2=40, minRadius=50, maxRadius=100)
     if circles is not None:
         circles = np.round(circles[0, :]).astype("int")
         for (x, y, r) in circles:
@@ -199,8 +199,9 @@ def sharpenImage(image: np.ndarray, kernel_size: tuple[int, int] = (7, 7), sigma
 
     """
     gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-    blurred = cv.GaussianBlur(gray, kernel_size, sigma)
-    return cv.addWeighted(gray, 1.0 + intensity, blurred, -intensity, 0)
+    #blurred = cv.GaussianBlur(gray, kernel_size, sigma)
+    #return cv.addWeighted(gray, 1.0 + intensity, blurred, -intensity, 0)
+    return gray
 
 # Main function
 def main() -> None:  # sourcery skip: do-not-use-bare-except
@@ -223,9 +224,9 @@ def main() -> None:  # sourcery skip: do-not-use-bare-except
 
     cam = cv.VideoCapture(0)
     print(cam.isOpened())
-    frame_count = 0
-    start_time = cv.getTickCount()
-    fps = 0
+    #frame_count = 0
+    #start_time = cv.getTickCount()
+    #fps = 0
     pixleSizeRatio = (Config.SIZE[0]*Config.SQUARE_LENGTH) / Config.TRANSFORMED_SIZE[0]
     print(pixleSizeRatio)
 
@@ -244,22 +245,23 @@ def main() -> None:  # sourcery skip: do-not-use-bare-except
             try:
                 if frame_to_display is not None:
                     if corner_ret:
-                        current_x_pos, current_y_pos = get_circle_position(frame_to_display,1)
+                        current_x_pos, current_y_pos = get_circle_position(frame_to_display,pixleSizeRatio)
+                        print(current_x_pos, current_y_pos)
 
-                    fps_text = f"FPS: {fps:.2f}"
-                    cv.putText(frame_to_display, fps_text, (20, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                    #fps_text = f"FPS: {fps:.2f}"
+                    #cv.putText(frame_to_display, fps_text, (20, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
                     cv.imshow("with ids", frame_to_display)  
-                    cv.imshow("unsharpened", cv.cvtColor(undistorted, cv.COLOR_BGR2GRAY))
+                    #cv.imshow("unsharpened", cv.cvtColor(undistorted, cv.COLOR_BGR2GRAY))
             except:
                 pass
 
-        frame_count += 1
-        end_time = cv.getTickCount()
-        elapsed_time = (end_time - start_time) / cv.getTickFrequency()
+        #frame_count += 1
+        #end_time = cv.getTickCount()
+        #elapsed_time = (end_time - start_time) / cv.getTickFrequency()
 
-        if frame_count % 30 == 0:
-            fps = frame_count / elapsed_time
+        #if frame_count % 30 == 0:
+            #fps = frame_count / elapsed_time
 
     print("Camera Released")
     cam.release()
