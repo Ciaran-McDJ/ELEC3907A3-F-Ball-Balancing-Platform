@@ -1,0 +1,22 @@
+This is a document of thigns that we can improve
+
+
+Software
+- Get multiple cores running or mutiple threads so camera stuff can be running asynchronously
+
+
+
+Things we can try
+- main loop can use velocity or not use velocity, something we can try
+    - If use velocity, not sure how control loop works (ciaran has basic idea to try with this)
+    - If don't use velocity, probably need to use derivative term of control loop, need to figure out what prof was telling use when she said not to use it
+- Could use z in some way, right now not using it at all
+
+
+
+Things we can do that probably don't matter
+- Beef up arms more so they don't bend
+- Instead of using correction term proportional to pitch and roll, use sin or cos something. Not sure exactly what it needs to be, but small angle approximation means it probably doesn't matter
+
+
+
