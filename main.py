@@ -2,6 +2,8 @@
 
 # Import Things
 # TODO import camera function and platform motion function
+from time import time
+from PlatformController import PlatformController
 
 
 
@@ -18,6 +20,8 @@ kIY = 0
 
 # DEFINE VARIABLES
 running = True # Program stops when turned to False
+lastLoopTime = time()
+currentLoopTime = time()
 timeSinceLastLoop = 0
 newXPos = None # Position for current run of loop
 newYPos = None
@@ -35,12 +39,15 @@ correctionX = 0
 correctionY = 0
 
 if __name__ == "main":
+    p = PlatformController()
     print("Starting Main Loop")
     while running == True: 
         # This is the loop that runs every 'frame'
 
         # SET UP FOR NEW RUN OF LOOP
-        timeSinceLastLoop = TODOgetTimeSinceLastRun()
+        lastLoopTime = currentLoopTime
+        currentLoopTime = time()
+        timeSinceLastLoop = currentLoopTime - lastLoopTime
         lastXPos = newXPos
         lastYPos = newYPos
         lastPropXErr = propXErr
@@ -50,7 +57,11 @@ if __name__ == "main":
         
         # GET CAMERA DATA
         newXPos, newYPos = getCameraData()
-        # TODO - deal with case where it returns None (didn't detect ball), also if ball goess off maybe if doesn't detect for some amount of time just stop
+        if newXPos == None:
+            # This means the camera did not manage to identify the ball position this frame
+            # TODO - deal with case where it returns None (didn't detect ball), also if ball goess off maybe if doesn't detect for some amount of time just stop
+            newXPos = lastXPos
+            newYPos = lastYPos
 
 
 
@@ -71,7 +82,7 @@ if __name__ == "main":
 
         # MOVE MOTORS
         # Note - right now pitch and roll proportional to correction, from small angle approximation angle should be roughly proportional to force which should be proportional to correction
-        moveMotors(roll = correctionY, pitch = correctionX, z = 0)
+        p.set_platform_angle(pitch = correctionX, roll = correctionY, z = 0)
 
 
 

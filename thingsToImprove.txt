@@ -3,7 +3,7 @@ This is a document of thigns that we can improve
 
 Software
 - Get multiple cores running or mutiple threads so camera stuff can be running asynchronously
-
+- standardize camelCase vs under_score_names for variable and function names
 
 
 Things we can try
