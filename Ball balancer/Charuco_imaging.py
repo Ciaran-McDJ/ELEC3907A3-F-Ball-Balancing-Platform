@@ -203,6 +203,19 @@ def sharpenImage(image: np.ndarray, kernel_size: tuple[int, int] = (7, 7), sigma
     #return cv.addWeighted(gray, 1.0 + intensity, blurred, -intensity, 0)
     return gray
 
+def draw_center(image: np.ndarray, x: float, y: float) -> None:
+    """
+    Draw the center of the circle on an image.
+
+    Args:
+        image (np.ndarray): The input image.
+        x (float): The x position of the circle.
+        y (float): The y position of the circle.
+    """
+    if x is not None and y is not None:
+        cv.circle(image, (int(x), int(y)), 5, (0, 0, 255), -1)
+
+
 # Main function
 def main() -> None:  # sourcery skip: do-not-use-bare-except
     """
@@ -248,24 +261,83 @@ def main() -> None:  # sourcery skip: do-not-use-bare-except
                         current_x_pos, current_y_pos = get_circle_position(frame_to_display,pixleSizeRatio)
                         print(current_x_pos, current_y_pos)
 
-                    #fps_text = f"FPS: {fps:.2f}"
-                    #cv.putText(frame_to_display, fps_text, (20, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
                     #cv.imshow("with ids", frame_to_display)  
-                    #cv.imshow("unsharpened", cv.cvtColor(undistorted, cv.COLOR_BGR2GRAY))
             except:
                 pass
-
-        #frame_count += 1
-        #end_time = cv.getTickCount()
-        #elapsed_time = (end_time - start_time) / cv.getTickFrequency()
-
-        #if frame_count % 30 == 0:
-            #fps = frame_count / elapsed_time
 
     print("Camera Released")
     cam.release()
     cv.destroyAllWindows()
+
+class Camera_Controller ():
+    """
+    implementation to control the collection of images from the camera and has functions to call
+    """
+    def __init__(self):
+        self.camMatrix = np.load(Config.CAM_MATRIX_PATH)
+        self.distMatrix = np.load(Config.DISTORTION_MATRIX_PATH)
+        self.dictionary = cv.aruco.getPredefinedDictionary(Config.ARUCO_DICT)
+        self.board = load_charuco_board()
+        self.pixleSizeRatio = (Config.SIZE[0]*Config.SQUARE_LENGTH) / Config.TRANSFORMED_SIZE[0]
+        self.cam = cv.VideoCapture(0)
+        print(self.cam.isOpened())
+
+    def __del__(self):
+        self.cam.release()
+        cv.destroyAllWindows()
+        
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.cam.release()
+        cv.destroyAllWindows()
+
+
+    def get_current_position(self):
+        """
+        this function returns the current position of the ball. It will take an image and return the balls
+        x and y position in meters. 
+        """
+        frame = self.cam.read()
+        undistorted = cv.undistort(frame, self.camMatrix, self.distMatrix)
+        undistorted_gray = sharpenImage(undistorted)
+        corner_ret, frame_to_display = drawCorners(undistorted_gray, self.dictionary, self.board, self.camMatrix, self.distMatrix)
+        try:
+            if frame_to_display is not None:
+                if corner_ret:
+                    current_x_pos, current_y_pos = get_circle_position(frame_to_display,self.pixleSizeRatio)
+                    return (current_x_pos, current_y_pos)
+                else:
+                    return (None, None)
+        except Exception:
+            return (None, None)
+        
+    def display_image(self):
+        """
+        this function displays the image from the camera and tracks the ball position, Used for testing and demos
+        """
+        ret, frame = self.cam.read()
+        if ret:
+            undistorted = cv.undistort(frame, self.camMatrix, self.distMatrix)
+            undistorted_gray = sharpenImage(undistorted)
+            corner_ret, frame_to_display = drawCorners(undistorted_gray, self.dictionary, self.board, self.camMatrix, self.distMatrix)
+            try:
+                if frame_to_display is not None:
+                    if corner_ret:
+                        current_x_pos, current_y_pos = get_circle_position(frame_to_display,self.pixleSizeRatio)
+                        draw_center(frame_to_display, current_x_pos, current_y_pos)
+                        
+                    cv.imshow("Camera View", frame_to_display)
+            except:
+                pass
+        
+        
+    def release_camera(self):
+        """
+        this function releases the camera
+        """
+        self.cam.release()
+        cv.destroyAllWindows()
+
 
 if __name__ == '__main__':
     main()
