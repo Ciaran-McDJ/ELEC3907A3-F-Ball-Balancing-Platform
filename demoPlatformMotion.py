@@ -2,7 +2,7 @@
 
 from time import time, sleep
 import math
-from PlatformController import PlatformController
+# from PlatformController import PlatformController
 
 # DEFINE VARIABLES
 running = True # Program stops when turned to False
@@ -31,12 +31,24 @@ def goToNextBehaviour():
     behaviourRunTime = 0
     currentLoopTime = behaviourStartTime
     lastLoopTime = behaviourStartTime
+    print("Starting new behaviour, behaviour =", behaviour)
 
+class PlatformControllerTEST():
+    def __init__(self) -> None:
+        pass
 
+    def set_platform_angle(a,b,c):
+        pass
 
-if __name__ == "main":
+    def clean_up():
+        pass
+
+print("helloooooo")
+print(__name__)
+
+if __name__ == "__main__":
     print("Starting Main Loop")
-    p = PlatformController()
+    p = PlatformControllerTEST()
     while running == True: 
         # This is the loop that runs every 'frame'
 
@@ -46,6 +58,8 @@ if __name__ == "main":
         timeSinceLastLoop = currentLoopTime - lastLoopTime
         behaviourRunTime += timeSinceLastLoop
         
+        print("new loop run, behaviour has been running for", behaviourRunTime, "s")
+
         # DECIDE HOW IT SHOULD MOVE, GOES THROUGH BEHAVIOURS
         if behaviour == 0:
             # does at z = 0 then higher z position. At each height go flat, then tilt each direction

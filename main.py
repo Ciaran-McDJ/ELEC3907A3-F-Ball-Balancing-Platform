@@ -59,6 +59,7 @@ if __name__ == "main":
         newXPos, newYPos = getCameraData()
         if newXPos == None:
             # This means the camera did not manage to identify the ball position this frame
+            # Assume ball moving at constant velocity from last frame
             # TODO - deal with case where it returns None (didn't detect ball), also if ball goess off maybe if doesn't detect for some amount of time just stop
             newXPos = lastXPos
             newYPos = lastYPos

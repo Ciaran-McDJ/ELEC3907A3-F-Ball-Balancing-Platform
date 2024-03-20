@@ -7,3 +7,10 @@ TODO
 Date TODO
 
 TODO - explain what is in repo and how thy interact
+
+
+
+
+main files that are intended to be run:
+- main.py - ballances ball in center of platform
+- demoPlatformMotion.py - shows off pretty platform movement, does not require camera
