@@ -133,3 +133,17 @@ if __name__ == "__main__":
         # MOVE MOTORS
         p.set_platform_angle(pitch = setPitch, roll = setRoll, z = setZ)
 
+
+
+
+
+
+
+#TEMP - code for behaviour 4
+        
+
+stabDistFromCenter = 5
+stabAngle = 0
+if (currentLoopTime - behaviourStartTime) > 30:
+    sleep(5)
+    goToNextBehaviour()

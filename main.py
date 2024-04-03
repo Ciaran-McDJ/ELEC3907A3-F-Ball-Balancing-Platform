@@ -38,7 +38,7 @@ intYErr = 0
 correctionX = 0
 correctionY = 0
 
-if __name__ == "main":
+if __name__ == "__main__":
     p = PlatformController()
     print("Starting Main Loop")
     while running == True: 

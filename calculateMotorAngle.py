@@ -11,7 +11,7 @@ P = 115.47 # Platform size constant (mm)
 a = 100 # Controlled arm length (mm)
 b = 150 # Uncotrolled arm (mm)
 
-h_0 = 100 # Default platform height
+h_0 = 111.8034 # Default platform height
 
 
 # Calculations that only need to be done once
