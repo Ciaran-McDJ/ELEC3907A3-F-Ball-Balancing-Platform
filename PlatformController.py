@@ -8,8 +8,8 @@ SERVO_1_PIN = 16
 SERVO_3_PIN = 12
 SERVO_2_PIN = 13
 
-MAX_ANGLE = 45
-MIN_ANGLE = -45
+MAX_ANGLE = 60
+MIN_ANGLE = -60
 
 def get_servo_angles(pitch, roll, z):
     """
